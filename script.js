@@ -1,74 +1,65 @@
-/* ===========================================
-   Learn Platform — Auto PDF Navigation
-   -------------------------------------------
-   💁‍♀️ Автоматически строит меню из structure.json
-   📎 Показывает PDF через встроенный viewer браузера
-   =========================================== */
-
-// Загружаем JSON-структуру
 async function loadStructure() {
-  const res = await fetch('structure.json?v=' + Date.now(), { cache: 'no-store' });
+  const res = await fetch('structure.json?v=' + Date.now());
   return await res.json();
 }
 
-// Построение навигации
-function buildNavigation(structure) {
-  const folderList = document.getElementById('folderList');
-  folderList.innerHTML = '';
+function createFolderItem(name, value, parentPath) {
+  const li = document.createElement('li');
+  li.classList.add('folder');
 
-  for (const [folder, content] of Object.entries(structure)) {
-    const folderItem = document.createElement('li');
-    folderItem.textContent = folder;
+  const textSpan = document.createElement('span');
+  textSpan.textContent = name;
+  const chevron = document.createElement('span');
+  chevron.classList.add('chevron');
+  chevron.textContent = '›';
+  li.appendChild(textSpan);
+  li.appendChild(chevron);
 
-    const subList = document.createElement('ul');
+  const sublist = document.createElement('ul');
+  sublist.classList.add('sublist');
 
-    // файлы в корне папки
-    if (content._files) {
-      content._files.forEach(file => {
-        const fileItem = document.createElement('li');
-        fileItem.textContent = file;
-        fileItem.addEventListener('click', () => {
-          document.getElementById('pdfViewer').src = encodeURI(`tutorials/${folder}/${file}`);
-        });
-        subList.appendChild(fileItem);
+  if (value._files) {
+    value._files.forEach(file => {
+      const fileLi = document.createElement('li');
+      fileLi.classList.add('file');
+      fileLi.textContent = file;
+      fileLi.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('pdfViewer').src = encodeURI(`pdfjs/web/viewer.html?file=../${parentPath}/${name}/${file}`);
       });
-    }
-
-    // подпапки
-    Object.keys(content).filter(k => k !== '_files').forEach(sub => {
-      const subItem = document.createElement('li');
-      subItem.textContent = sub;
-      const nestedList = document.createElement('ul');
-
-      const subContent = content[sub];
-      if (subContent._files) {
-        subContent._files.forEach(file => {
-          const fi = document.createElement('li');
-          fi.textContent = file;
-          fi.addEventListener('click', () => {
-            document.getElementById('pdfViewer').src = encodeURI(`tutorials/${folder}/${sub}/${file}`);
-          });
-          nestedList.appendChild(fi);
-        });
-      }
-
-      subItem.appendChild(nestedList);
-      subList.appendChild(subItem);
+      sublist.appendChild(fileLi);
     });
-
-    folderItem.appendChild(subList);
-    folderList.appendChild(folderItem);
   }
+
+  Object.keys(value).filter(k => k !== '_files').forEach(sub => {
+    const child = createFolderItem(sub, value[sub], `${parentPath}/${name}`);
+    sublist.appendChild(child);
+  });
+
+  li.addEventListener('click', (e) => {
+    if (e.target === li || e.target === textSpan || e.target === chevron) {
+      sublist.classList.toggle('open');
+      li.classList.toggle('open');
+    }
+  });
+
+  li.appendChild(sublist);
+  return li;
 }
 
-// Инициализация
+function buildNavigation(structure) {
+  const list = document.getElementById('folderList');
+  list.innerHTML = '';
+  Object.entries(structure).forEach(([name, value]) => {
+    const item = createFolderItem(name, value, 'tutorials');
+    list.appendChild(item);
+  });
+}
+
 async function init() {
-  try {
-    const structure = await loadStructure();
-    buildNavigation(structure);
-  } catch (e) {
-    console.error('Не удалось загрузить structure.json', e);
-  }
+  const structure = await loadStructure();
+  buildNavigation(structure);
 }
 
 init();
+setInterval(init, 60000);
