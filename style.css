@@ -9,7 +9,130 @@
   --color-secondary: #4d6586;
   --color-background: linear-gradient(135deg, #f6fbff 0%, #e6f2ff 100%);
   --hover-bg: rgba(200, 220, 240, 0.5);
+/* ===========================================
+   Learn Platform — UI with Noto Sans and accordion
+   =========================================== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap');
+
+:root {
+  --sidebar-width: 280px;
+  --color-primary: #1a3c60;
+  --color-secondary: #4d6586;
+  --color-background: linear-gradient(135deg, #f6fbff 0%, #e6f2ff 100%);
+  --hover-bg: rgba(200, 220, 240, 0.5);
 }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  height: 100vh;
+  background: var(--color-background);
+  display: flex;
+  overflow: hidden;
+  color: var(--color-primary);
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(5px);
+  border-right: 1px solid rgba(0,0,0,0.05);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+/* top-level folders */
+.sidebar ul > li.folder {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 6px 0;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s ease;
+}
+
+.sidebar ul > li.folder:hover {
+  background: var(--hover-bg);
+}
+
+.sidebar ul > li.folder .chevron {
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.sidebar ul > li.folder.open .chevron {
+  transform: rotate(90deg);
+}
+
+.sidebar ul.sublist {
+  margin-left: 10px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+
+.sidebar ul.sublist.open {
+  max-height: 500px;
+}
+
+.sidebar ul.sublist li.file {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-secondary);
+  margin: 3px 0;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.sidebar ul.sublist li.file:hover {
+  background: var(--hover-bg);
+  padding-left: 14px;
+}
+
+.viewer {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+}
+
+.viewer iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
 
 * {
   box-sizing: border-box;
